@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "79039094734",
+    "project_id": "kickflip-67",
+    "storage_bucket": "kickflip-67.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79039094734:android:5ebed16679eb718e4a559f",
+        "android_client_info": {
+          "package_name": "uri.app.kickflip"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlTPqRzZHp7dIV7dcVqPQFV1zMRuHYLcY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
