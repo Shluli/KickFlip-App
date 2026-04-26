@@ -19,19 +19,20 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginDialog extends DialogFragment {
 
-    EditText emailEt, passwordEt;
-    Button loginBtn, forgotBtn;
-    TextView errorTv;
-    ImageButton closeBtn;
+    private EditText emailEt, passwordEt;
+    private Button loginBtn, forgotBtn;
+    private TextView errorTv;
+    private ImageButton closeBtn;
 
-    FirebaseAuth auth;
+    private FirebaseAuth auth;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Dialog dialog = new Dialog(requireContext());
-        dialog.setContentView(R.layout.fragment_login); // your layout
+        dialog.setContentView(R.layout.fragment_login);
 
+        dialog.setCanceledOnTouchOutside(true);
         auth = FirebaseAuth.getInstance();
 
         emailEt = dialog.findViewById(R.id.EditTextEmailLogin);
@@ -41,42 +42,8 @@ public class LoginDialog extends DialogFragment {
         errorTv = dialog.findViewById(R.id.ViewLoginError);
         closeBtn = dialog.findViewById(R.id.CloseLoginBtn);
 
-        loginBtn.setOnClickListener(v -> {
-            String email = emailEt.getText().toString().trim();
-            String password = passwordEt.getText().toString().trim();
-
-            if (email.isEmpty() || password.isEmpty()) {
-                errorTv.setText("Missing email or password");
-                return;
-            }
-
-            loginBtn.setEnabled(false);
-            errorTv.setText("Logging in...");
-
-            auth.signInWithEmailAndPassword(email, password)
-                    .addOnSuccessListener(result -> {
-                        Intent i = new Intent(getContext(), HomeActivity.class); // change this
-                        startActivity(i);
-                        dismiss();
-                    })
-                    .addOnFailureListener(e -> {
-                        errorTv.setText(e.getMessage());
-                        loginBtn.setEnabled(true);
-                    });
-        });
-
-        forgotBtn.setOnClickListener(v -> {
-            String email = emailEt.getText().toString().trim();
-            if (email.isEmpty()) {
-                errorTv.setText("Enter email first");
-                return;
-            }
-
-            auth.sendPasswordResetEmail(email)
-                    .addOnSuccessListener(aVoid -> errorTv.setText("Reset email sent"))
-                    .addOnFailureListener(e -> errorTv.setText(e.getMessage()));
-        });
-
+        loginBtn.setOnClickListener(v -> attemptLogin());
+        forgotBtn.setOnClickListener(v -> resetPassword());
         closeBtn.setOnClickListener(v -> dismiss());
 
         if (dialog.getWindow() != null) {
@@ -87,6 +54,43 @@ public class LoginDialog extends DialogFragment {
             );
         }
 
+        setCancelable(true);
         return dialog;
+    }
+
+    private void attemptLogin() {
+        String email = emailEt.getText().toString().trim();
+        String password = passwordEt.getText().toString().trim();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            errorTv.setText("Missing email or password");
+            return;
+        }
+
+        // FIXED: Disable button only after validation passes
+        loginBtn.setEnabled(false);
+        errorTv.setText("Logging in...");
+
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(result -> {
+                    startActivity(new Intent(requireActivity(), HomeActivity.class));
+                    dismiss();
+                })
+                .addOnFailureListener(e -> {
+                    errorTv.setText("Login failed: " + e.getLocalizedMessage());
+                    loginBtn.setEnabled(true); // Re-enable so they can try again
+                });
+    }
+
+    private void resetPassword() {
+        String email = emailEt.getText().toString().trim();
+        if (email.isEmpty()) {
+            errorTv.setText("Enter email first");
+            return;
+        }
+
+        auth.sendPasswordResetEmail(email)
+                .addOnSuccessListener(aVoid -> errorTv.setText("Reset email sent"))
+                .addOnFailureListener(e -> errorTv.setText(e.getLocalizedMessage()));
     }
 }

@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Vault Theme Colors -->
+    <color name="vault_primary">#2196F3</color>
+    <color name="vault_primary_dark">#1976D2</color>
+    <color name="vault_accent">#FFC107</color>
+    
+    <!-- Selection Colors -->
+    <color name="selected_trick">#4CAF50</color>
+    <color name="selected_terrain">#FF9800</color>
+    
+    <!-- Background Colors -->
+    <color name="vault_background">#F5F5F5</color>
+    <color name="card_background">#FFFFFF</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
 </resources>

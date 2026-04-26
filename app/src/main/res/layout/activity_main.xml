@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="#F9F9F9">
 
     <TextView
         android:id="@+id/header"
@@ -68,7 +68,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="13dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Already have an account"
+        android:text="Already have an account?"
         android:textColor="#404040"
         android:textSize="17sp"
         app:layout_constraintEnd_toEndOf="parent"

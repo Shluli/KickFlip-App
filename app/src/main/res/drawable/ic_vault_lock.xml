@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Vault Lock Icon -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M12,1C8.676,1 6,3.676 6,7v4H5c-1.105,0 -2,0.895 -2,2v9c0,1.105 0.895,2 2,2h14c1.105,0 2,-0.895 2,-2v-9c0,-1.105 -0.895,-2 -2,-2h-1V7C18,3.676 15.324,1 12,1zM12,3c2.276,0 4,1.724 4,4v4H8V7C8,4.724 9.724,3 12,3zM12,14c1.105,0 2,0.895 2,2c0,0.738 -0.405,1.376 -1,1.723V20h-2v-2.277C10.405,17.376 10,16.738 10,16C10,14.895 10.895,14 12,14z"/>
+    
+    <!-- Gear teeth around the circle -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M12,5.5L13,6.5L12,7.5L11,6.5Z"/>
+    <path
+        android:fillColor="#000000"
+        android:pathData="M15.5,7L16.5,8L15.5,9L14.5,8Z"/>
+    <path
+        android:fillColor="#000000"
+        android:pathData="M8.5,7L9.5,8L8.5,9L7.5,8Z"/>
+</vector>
