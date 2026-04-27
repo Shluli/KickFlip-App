@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Manual pad block -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,38 L8,28 L40,28 L40,38 Z" />
+    <!-- Top face highlight -->
+    <path
+        android:fillColor="#DDDDDD"
+        android:pathData="M8,28 L40,28 L40,32 L8,32 Z" />
+    <!-- Skateboard on manual arc -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#888888"
+        android:strokeWidth="2"
+        android:pathData="M16,26 Q24,20 34,26" />
+    <!-- Back wheel (circle via arc) -->
+    <path
+        android:fillColor="#888888"
+        android:pathData="M17,27 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0" />
+</vector>

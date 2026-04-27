@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <!-- Rail/ledge -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M4,22 L36,22" />
+    <!-- Board grinding on rail (axle on top) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M10,16 L30,16 L30,19 L10,19 Z" />
+    <!-- Trucks (axles touching rail) -->
+    <path
+        android:fillColor="#CCCCCC"
+        android:pathData="M13,19 L13,23 L18,23 L18,19 Z" />
+    <path
+        android:fillColor="#CCCCCC"
+        android:pathData="M22,19 L22,23 L27,23 L27,19 Z" />
+    <!-- Sparks -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M20,24 L22,28" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M24,25 L27,29" />
+</vector>

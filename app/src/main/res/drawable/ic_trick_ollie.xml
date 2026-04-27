@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <!-- Board launching upward arc -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M6,32 Q10,10 34,10" />
+    <!-- Skateboard deck (angled) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,8 L38,12 L34,16 L22,12 Z" />
+    <!-- Front wheel (circle r=2.5 at 25,13) -->
+    <path
+        android:fillColor="#CCCCCC"
+        android:pathData="M22.5,13 A2.5,2.5 0 1,1 27.5,13 A2.5,2.5 0 1,1 22.5,13 Z" />
+    <!-- Back wheel (circle r=2.5 at 35,13) -->
+    <path
+        android:fillColor="#CCCCCC"
+        android:pathData="M32.5,13 A2.5,2.5 0 1,1 37.5,13 A2.5,2.5 0 1,1 32.5,13 Z" />
+    <!-- Ground line -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M2,34 L18,34" />
+</vector>

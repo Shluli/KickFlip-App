@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Curb/ledge block -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,36 L6,26 L38,26 L38,36 Z" />
+    <!-- Ledge top accent -->
+    <path
+        android:fillColor="#CCCCCC"
+        android:pathData="M6,26 L38,26 L38,29 L6,29 Z" />
+    <!-- Side face -->
+    <path
+        android:fillColor="#AAAAAA"
+        android:pathData="M38,26 L44,20 L44,30 L38,36 Z" />
+    <!-- Ground -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M4,36 L44,36" />
+</vector>

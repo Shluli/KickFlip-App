@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <!-- Rotation arrows (circular) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:pathData="M20,6 A14,14 0 1,1 6,20" />
+    <!-- Arrow head -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M3,16 L6,24 L10,18 Z" />
+    <!-- Flip indicator - board cross-section -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14,20 L26,20 L26,23 L14,23 Z" />
+</vector>

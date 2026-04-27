@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 
 public class LoginDialog extends DialogFragment {
 
@@ -77,8 +78,31 @@ public class LoginDialog extends DialogFragment {
                     dismiss();
                 })
                 .addOnFailureListener(e -> {
-                    errorTv.setText("Login failed: " + e.getLocalizedMessage());
-                    loginBtn.setEnabled(true); // Re-enable so they can try again
+                    String message;
+                    if (e instanceof FirebaseAuthException) {
+                        switch (((FirebaseAuthException) e).getErrorCode()) {
+                            case "ERROR_NETWORK_REQUEST_FAILED":
+                                message = "No internet connection — check your network and try again.";
+                                break;
+                            case "ERROR_INVALID_CREDENTIAL":
+                            case "ERROR_USER_NOT_FOUND":
+                            case "ERROR_WRONG_PASSWORD":
+                                message = "Incorrect email or password.";
+                                break;
+                            case "ERROR_USER_DISABLED":
+                                message = "This account has been disabled.";
+                                break;
+                            case "ERROR_TOO_MANY_REQUESTS":
+                                message = "Too many attempts — try again later.";
+                                break;
+                            default:
+                                message = "Login failed: " + e.getLocalizedMessage();
+                        }
+                    } else {
+                        message = "Login failed: " + e.getLocalizedMessage();
+                    }
+                    errorTv.setText(message);
+                    loginBtn.setEnabled(true);
                 });
     }
 

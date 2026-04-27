@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <!-- Board high in the air -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M10,8 L30,8 L30,12 L10,12 Z" />
+    <!-- Grab hand reaching down -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M20,12 L20,22" />
+    <!-- Wind/air curves under -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M8,28 Q14,24 20,28 Q26,32 32,28" />
+    <!-- Ground -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M4,36 L36,36" />
+</vector>

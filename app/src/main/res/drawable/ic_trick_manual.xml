@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <!-- Board tilted nose up (manual position) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M8,32 L32,16 L34,20 L10,36 Z" />
+    <!-- Back wheel touching ground (circle r=3.5 at 10,34) -->
+    <path
+        android:fillColor="#CCCCCC"
+        android:pathData="M6.5,34 A3.5,3.5 0 1,1 13.5,34 A3.5,3.5 0 1,1 6.5,34 Z" />
+    <!-- Balance point indicator -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.6"
+        android:pathData="M10,38 L14,38" />
+    <!-- Ground line -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M2,38 L38,38" />
+</vector>

@@ -327,7 +327,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
             android:backgroundTint="#111111"
-            android:enabled="false"
+            android:enabled="true"
             android:fontFamily="sans-serif-medium"
             android:padding="16dp"
             android:stateListAnimator="@null"

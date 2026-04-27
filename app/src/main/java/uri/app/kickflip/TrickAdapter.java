@@ -80,7 +80,7 @@ public class TrickAdapter extends RecyclerView.Adapter<TrickAdapter.TrickViewHol
             tvTerrainInfo.setText(terrainInfo);
             
             // Format date (show just date, not time)
-            String dateStr = trick.date;
+            String dateStr = trick.date != null ? trick.date : "";
             if (dateStr.contains(" ")) {
                 dateStr = dateStr.split(" ")[0];
             }
