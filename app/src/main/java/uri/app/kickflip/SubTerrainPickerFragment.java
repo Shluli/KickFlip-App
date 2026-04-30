@@ -28,10 +28,20 @@ public class SubTerrainPickerFragment extends Fragment {
     public static class SubTerrainItem {
         public final String name;
         public final String description;
+        /** The terrain key passed to TrickPickerFragment / DifficultyEngine. Defaults to name. */
+        public final String terrainKey;
+        /** Pre-selected SIZE measurement (1–4). 0 means no preset. */
+        public final int presetMeasurement;
 
         public SubTerrainItem(String name, String description) {
+            this(name, description, name, 0);
+        }
+
+        public SubTerrainItem(String name, String description, String terrainKey, int presetMeasurement) {
             this.name = name;
             this.description = description;
+            this.terrainKey = terrainKey;
+            this.presetMeasurement = presetMeasurement;
         }
     }
 
@@ -39,9 +49,10 @@ public class SubTerrainPickerFragment extends Fragment {
 
     static {
         SUB_TERRAINS.put("Pool", Arrays.asList(
-            new SubTerrainItem("Bowl",         "Deep pool / kidney"),
-            new SubTerrainItem("Quarter Pipe",  "Single-wall transition"),
-            new SubTerrainItem("Half Pipe",     "Full vert ramp")
+            new SubTerrainItem("Small Quarter Pipe (2ft)", "Beginner transition",  "Quarter Pipe", 1),
+            new SubTerrainItem("Medium Quarter Pipe (4ft)","Standard transition",  "Quarter Pipe", 2),
+            new SubTerrainItem("Big Quarter Pipe (6ft)",   "Large transition",     "Quarter Pipe", 3),
+            new SubTerrainItem("Vert (8ft+)",              "Full vert ramp",       "Quarter Pipe", 4)
         ));
 
         SUB_TERRAINS.put("Park", Arrays.asList(
@@ -104,6 +115,9 @@ public class SubTerrainPickerFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sub_terrain_picker, container, false);
 
+        view.findViewById(R.id.btn_back).setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager().popBackStack());
+
         ((TextView) view.findViewById(R.id.tv_sub_category_label)).setText(category);
 
         View accent = view.findViewById(R.id.view_category_accent);
@@ -143,7 +157,7 @@ public class SubTerrainPickerFragment extends Fragment {
 
             holder.itemView.setOnClickListener(v -> {
                 animateBounce(holder.itemView);
-                v.postDelayed(() -> navigateToTrickPicker(item.name), 220);
+                v.postDelayed(() -> navigateToTrickPicker(item), 220);
             });
         }
 
@@ -173,13 +187,14 @@ public class SubTerrainPickerFragment extends Fragment {
         anim.start();
     }
 
-    private void navigateToTrickPicker(String terrain) {
+    private void navigateToTrickPicker(SubTerrainItem item) {
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(
                         R.anim.slide_in_right, R.anim.slide_out_left,
                         R.anim.slide_in_left,  R.anim.slide_out_right)
-                .replace(R.id.homeFragmentContainer, TrickPickerFragment.newInstance(terrain))
+                .replace(R.id.homeFragmentContainer,
+                        TrickPickerFragment.newInstance(item.terrainKey, item.presetMeasurement))
                 .addToBackStack(null)
                 .commit();
     }

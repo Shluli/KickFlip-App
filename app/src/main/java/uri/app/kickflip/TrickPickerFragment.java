@@ -7,7 +7,6 @@ import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,14 +21,15 @@ import java.util.Map;
 
 public class TrickPickerFragment extends Fragment {
 
-    private static final String ARG_TERRAIN = "terrain";
+    private static final String ARG_TERRAIN            = "terrain";
+    private static final String ARG_PRESET_MEASUREMENT = "preset_measurement";
 
     // ---- Data model ----------------------------------------------------------
 
     public static class TrickItem {
         public final String name;
         public final int difficulty;
-        public final String category; // FLIP / GRIND / SLIDE / OLLIE / AIR / MANUAL
+        public final String category; // FLIP / GRIND / SLIDE / OLLIE / AIR / MANUAL / STALL / HANDPLANT
 
         public TrickItem(String name, int difficulty, String category) {
             this.name = name;
@@ -49,8 +49,6 @@ public class TrickPickerFragment extends Fragment {
             new TrickItem("Kickflip",        3, "FLIP"),
             new TrickItem("Heelflip",        3, "FLIP"),
             new TrickItem("Fakie Kickflip",  3, "FLIP"),
-            new TrickItem("Frontside Flip",  4, "FLIP"),
-            new TrickItem("Backside Flip",   4, "FLIP"),
             new TrickItem("Varial Flip",     4, "FLIP"),
             new TrickItem("Hardflip",        4, "FLIP"),
             new TrickItem("Treflip",         5, "FLIP"),
@@ -61,16 +59,14 @@ public class TrickPickerFragment extends Fragment {
 
     private static List<TrickItem> jumpTricks() {
         return Arrays.asList(
-            new TrickItem("Ollie",          2, "OLLIE"),
-            new TrickItem("Pop Shuvit",     2, "OLLIE"),
-            new TrickItem("Kickflip",       3, "FLIP"),
-            new TrickItem("Heelflip",       3, "FLIP"),
-            new TrickItem("Frontside Flip", 4, "FLIP"),
-            new TrickItem("Backside Flip",  4, "FLIP"),
-            new TrickItem("Varial Flip",    4, "FLIP"),
-            new TrickItem("Hardflip",       4, "FLIP"),
-            new TrickItem("Treflip",        5, "FLIP"),
-            new TrickItem("Impossible",     4, "FLIP")
+            new TrickItem("Ollie",       2, "OLLIE"),
+            new TrickItem("Pop Shuvit",  2, "OLLIE"),
+            new TrickItem("Kickflip",    3, "FLIP"),
+            new TrickItem("Heelflip",    3, "FLIP"),
+            new TrickItem("Varial Flip", 4, "FLIP"),
+            new TrickItem("Hardflip",    4, "FLIP"),
+            new TrickItem("Treflip",     5, "FLIP"),
+            new TrickItem("Impossible",  4, "FLIP")
         );
     }
 
@@ -104,19 +100,43 @@ public class TrickPickerFragment extends Fragment {
         );
     }
 
-    private static List<TrickItem> vertTricks() {
+    private static List<TrickItem> quarterPipeTricks() {
         return Arrays.asList(
-            new TrickItem("Rock to Fakie",  2, "AIR"),
-            new TrickItem("Axle Stall",     2, "GRIND"),
-            new TrickItem("Frontside Air",  2, "AIR"),
-            new TrickItem("Backside Air",   2, "AIR"),
-            new TrickItem("Indy Grab",      3, "AIR"),
-            new TrickItem("Stalefish",      3, "AIR"),
-            new TrickItem("Method Air",     3, "AIR"),
-            new TrickItem("Smith Grind",    4, "GRIND"),
-            new TrickItem("Kickflip Indy",  4, "AIR"),
-            new TrickItem("540",            5, "AIR"),
-            new TrickItem("McTwist",        5, "AIR")
+            // Stalls — no spin, BS/FS direction
+            new TrickItem("Rock to Fakie",    2, "STALL"),
+            new TrickItem("Axle Stall",       2, "STALL"),
+            new TrickItem("Nosestall",        3, "STALL"),
+            new TrickItem("Tailstall",        3, "STALL"),
+            new TrickItem("Smith Stall",      3, "STALL"),
+            new TrickItem("Disaster",         3, "STALL"),
+            new TrickItem("Blunt Stall",      4, "STALL"),
+            new TrickItem("Lien to Tail",     4, "STALL"),
+            new TrickItem("Noseblunt Stall",  5, "STALL"),
+            // Grinds — no spin, BS/FS direction
+            new TrickItem("50-50",            3, "GRIND"),
+            new TrickItem("5-0",              3, "GRIND"),
+            new TrickItem("Nosegrind",        3, "GRIND"),
+            new TrickItem("Smith Grind",      4, "GRIND"),
+            new TrickItem("Layback Grind",    4, "GRIND"),
+            // Air grabs — spin + BS/FS
+            new TrickItem("Air",              2, "AIR"),
+            new TrickItem("Indy Grab",        3, "AIR"),
+            new TrickItem("Stalefish",        3, "AIR"),
+            new TrickItem("Method Air",       3, "AIR"),
+            new TrickItem("Melon Grab",       3, "AIR"),
+            new TrickItem("Lien Air",         3, "AIR"),
+            new TrickItem("Nose Grab",        3, "AIR"),
+            new TrickItem("Tail Grab",        3, "AIR"),
+            new TrickItem("Body Jar",         4, "AIR"),
+            new TrickItem("Christ Air",       5, "AIR"),
+            // Handplants
+            new TrickItem("Eggplant",         4, "HANDPLANT"),
+            new TrickItem("Invert",           5, "HANDPLANT"),
+            // Flip tricks — spin eligible
+            new TrickItem("Kickflip",         4, "FLIP"),
+            new TrickItem("Heelflip",         4, "FLIP"),
+            new TrickItem("Treflip",          5, "FLIP"),
+            new TrickItem("Impossible",       4, "FLIP")
         );
     }
 
@@ -140,51 +160,24 @@ public class TrickPickerFragment extends Fragment {
         // Flatground
         TRICKS_BY_TERRAIN.put("Flatground", flatTricks());
 
-        // Pool
-        TRICKS_BY_TERRAIN.put("Bowl",         vertTricks());
-        TRICKS_BY_TERRAIN.put("Quarter Pipe", Arrays.asList(
-            new TrickItem("Rock to Fakie", 2, "AIR"),
-            new TrickItem("Axle Stall",    2, "GRIND"),
-            new TrickItem("Disaster",      3, "AIR"),
-            new TrickItem("50-50",         3, "GRIND"),
-            new TrickItem("Nosegrind",     3, "GRIND"),
-            new TrickItem("Frontside Air", 3, "AIR"),
-            new TrickItem("Backside Air",  3, "AIR"),
-            new TrickItem("Smith Grind",   4, "GRIND"),
-            new TrickItem("Indy Grab",     4, "AIR"),
-            new TrickItem("Kickflip Indy", 5, "AIR")
-        ));
-        TRICKS_BY_TERRAIN.put("Half Pipe", Arrays.asList(
-            new TrickItem("Rock to Fakie", 2, "AIR"),
-            new TrickItem("Frontside Air", 2, "AIR"),
-            new TrickItem("Backside Air",  2, "AIR"),
-            new TrickItem("Indy Grab",     3, "AIR"),
-            new TrickItem("Stalefish",     3, "AIR"),
-            new TrickItem("Method Air",    3, "AIR"),
-            new TrickItem("Kickflip Indy", 4, "AIR"),
-            new TrickItem("540",           5, "AIR"),
-            new TrickItem("McTwist",       5, "AIR")
-        ));
+        TRICKS_BY_TERRAIN.put("Quarter Pipe", quarterPipeTricks());
 
         // Park
         TRICKS_BY_TERRAIN.put("Ramp", Arrays.asList(
-            new TrickItem("Rock to Fakie", 2, "AIR"),
-            new TrickItem("Axle Stall",    2, "GRIND"),
-            new TrickItem("Disaster",      3, "AIR"),
+            new TrickItem("Rock to Fakie", 2, "STALL"),
+            new TrickItem("Axle Stall",    2, "STALL"),
+            new TrickItem("Disaster",      3, "STALL"),
             new TrickItem("Kickflip",      3, "FLIP"),
             new TrickItem("Heelflip",      3, "FLIP"),
-            new TrickItem("Frontside Air", 3, "AIR"),
             new TrickItem("Indy Grab",     4, "AIR"),
             new TrickItem("Smith Grind",   4, "GRIND")
         ));
         TRICKS_BY_TERRAIN.put("Bank", Arrays.asList(
-            new TrickItem("Ollie",          1, "OLLIE"),
-            new TrickItem("Pop Shuvit",     2, "OLLIE"),
-            new TrickItem("Kickflip",       3, "FLIP"),
-            new TrickItem("Heelflip",       3, "FLIP"),
-            new TrickItem("Rock to Fakie",  3, "AIR"),
-            new TrickItem("Frontside Flip", 4, "FLIP"),
-            new TrickItem("Smith Grind",    4, "GRIND")
+            new TrickItem("Ollie",       1, "OLLIE"),
+            new TrickItem("Pop Shuvit",  2, "OLLIE"),
+            new TrickItem("Kickflip",    3, "FLIP"),
+            new TrickItem("Heelflip",    3, "FLIP"),
+            new TrickItem("Smith Grind", 4, "GRIND")
         ));
         TRICKS_BY_TERRAIN.put("Pyramid", Arrays.asList(
             new TrickItem("Ollie",       2, "OLLIE"),
@@ -196,57 +189,65 @@ public class TrickPickerFragment extends Fragment {
             new TrickItem("Tailslide",   3, "SLIDE"),
             new TrickItem("Smith Grind", 4, "GRIND")
         ));
-        TRICKS_BY_TERRAIN.put("Euro Gap",   jumpTricks());
-        TRICKS_BY_TERRAIN.put("Frame",      jumpTricks());
-        TRICKS_BY_TERRAIN.put("Frame Gap",  jumpTricks());
+        TRICKS_BY_TERRAIN.put("Euro Gap",  jumpTricks());
+        TRICKS_BY_TERRAIN.put("Frame",     jumpTricks());
+        TRICKS_BY_TERRAIN.put("Frame Gap", jumpTricks());
 
         // Street — grinds / slides
-        TRICKS_BY_TERRAIN.put("Ledge",        grindSlideTricks());
-        TRICKS_BY_TERRAIN.put("Rail",         grindSlideTricks());
-        TRICKS_BY_TERRAIN.put("Curved Rail",  basicGrindTricks());
-        TRICKS_BY_TERRAIN.put("Hubba",        basicGrindTricks());
-        TRICKS_BY_TERRAIN.put("Bench",        grindSlideTricks());
-        TRICKS_BY_TERRAIN.put("Table",        basicGrindTricks());
-        TRICKS_BY_TERRAIN.put("Curb",         basicGrindTricks());
+        TRICKS_BY_TERRAIN.put("Ledge",       grindSlideTricks());
+        TRICKS_BY_TERRAIN.put("Rail",        grindSlideTricks());
+        TRICKS_BY_TERRAIN.put("Curved Rail", basicGrindTricks());
+        TRICKS_BY_TERRAIN.put("Hubba",       basicGrindTricks());
+        TRICKS_BY_TERRAIN.put("Bench",       grindSlideTricks());
+        TRICKS_BY_TERRAIN.put("Table",       basicGrindTricks());
+        TRICKS_BY_TERRAIN.put("Curb",        basicGrindTricks());
 
         // Street — jumps
-        TRICKS_BY_TERRAIN.put("Down Stairs",      jumpTricks());
-        TRICKS_BY_TERRAIN.put("Up Stairs",         jumpTricks());
-        TRICKS_BY_TERRAIN.put("Gap",               jumpTricks());
-        TRICKS_BY_TERRAIN.put("Over an obsticle",  jumpTricks());
+        TRICKS_BY_TERRAIN.put("Down Stairs",     jumpTricks());
+        TRICKS_BY_TERRAIN.put("Up Stairs",       jumpTricks());
+        TRICKS_BY_TERRAIN.put("Gap",             jumpTricks());
+        TRICKS_BY_TERRAIN.put("Over an obsticle",jumpTricks());
 
-        // Street — grass (flatground-like but harder)
+        // Street — grass
         TRICKS_BY_TERRAIN.put("Grass", Arrays.asList(
-            new TrickItem("Ollie",          2, "OLLIE"),
-            new TrickItem("Pop Shuvit",     3, "OLLIE"),
-            new TrickItem("Kickflip",       4, "FLIP"),
-            new TrickItem("Heelflip",       4, "FLIP"),
-            new TrickItem("Frontside Flip", 5, "FLIP")
+            new TrickItem("Ollie",       2, "OLLIE"),
+            new TrickItem("Pop Shuvit",  3, "OLLIE"),
+            new TrickItem("Kickflip",    4, "FLIP"),
+            new TrickItem("Heelflip",    4, "FLIP")
         ));
 
         // Street — manuals
-        TRICKS_BY_TERRAIN.put("On a manual pad",  manualTricks());
-        TRICKS_BY_TERRAIN.put("Up a Manual Pad",  manualTricks());
+        TRICKS_BY_TERRAIN.put("On a manual pad", manualTricks());
+        TRICKS_BY_TERRAIN.put("Up a Manual Pad", manualTricks());
     }
 
     // ---- Factory -------------------------------------------------------------
 
     public static TrickPickerFragment newInstance(String terrain) {
+        return newInstance(terrain, 0);
+    }
+
+    public static TrickPickerFragment newInstance(String terrain, int presetMeasurement) {
         TrickPickerFragment f = new TrickPickerFragment();
         Bundle args = new Bundle();
         args.putString(ARG_TERRAIN, terrain);
+        args.putInt(ARG_PRESET_MEASUREMENT, presetMeasurement);
         f.setArguments(args);
         return f;
     }
 
     private String terrain;
+    private int presetMeasurement;
 
     // ---- Lifecycle -----------------------------------------------------------
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        terrain = getArguments() != null ? getArguments().getString(ARG_TERRAIN, "") : "";
+        if (getArguments() != null) {
+            terrain            = getArguments().getString(ARG_TERRAIN, "");
+            presetMeasurement  = getArguments().getInt(ARG_PRESET_MEASUREMENT, 0);
+        }
     }
 
     @Nullable
@@ -255,7 +256,10 @@ public class TrickPickerFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trick_picker, container, false);
 
-        ((TextView) view.findViewById(R.id.tv_trick_terrain_label)).setText(terrain);
+        view.findViewById(R.id.btn_back).setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager().popBackStack());
+
+        ((TextView) view.findViewById(R.id.tv_trick_terrain_label)).setText(terrainDisplayName());
 
         List<TrickItem> tricks = TRICKS_BY_TERRAIN.get(terrain);
         if (tricks == null) tricks = new ArrayList<>();
@@ -267,24 +271,18 @@ public class TrickPickerFragment extends Fragment {
         return view;
     }
 
-    // ---- Adapter -------------------------------------------------------------
-
-    private int iconForCategory(String cat) {
-        switch (cat) {
-            case "FLIP":   return R.drawable.ic_trick_flip;
-            case "GRIND":  return R.drawable.ic_trick_grind;
-            case "SLIDE":  return R.drawable.ic_trick_slide;
-            case "AIR":    return R.drawable.ic_trick_air;
-            case "MANUAL": return R.drawable.ic_trick_manual;
-            default:       return R.drawable.ic_trick_ollie;
+    /** Human-readable label shown at the top of the screen. */
+    private String terrainDisplayName() {
+        if ("Quarter Pipe".equals(terrain) && presetMeasurement > 0) {
+            String[] labels = {"Small Quarter Pipe (2ft)", "Medium Quarter Pipe (4ft)",
+                               "Big Quarter Pipe (6ft)",   "Vert (8ft+)"};
+            int idx = presetMeasurement - 1;
+            if (idx >= 0 && idx < labels.length) return labels[idx];
         }
+        return terrain;
     }
 
-    private String buildStars(int difficulty) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 5; i++) sb.append(i < difficulty ? "★" : "☆");
-        return sb.toString();
-    }
+    // ---- Adapter -------------------------------------------------------------
 
     private void animateBounce(View view) {
         PropertyValuesHolder scaleX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 0.9f, 1.1f, 1.0f);
@@ -311,13 +309,10 @@ public class TrickPickerFragment extends Fragment {
         public void onBindViewHolder(@NonNull VH holder, int position) {
             TrickItem item = items.get(position);
             holder.tvName.setText(item.name);
-            holder.tvStars.setText(buildStars(item.difficulty));
-            holder.ivIcon.setImageResource(iconForCategory(item.category));
-
             holder.itemView.setOnClickListener(v -> {
                 animateBounce(holder.itemView);
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
-                v.postDelayed(() -> navigateToAddTrick(item), 250);
+                v.postDelayed(() -> navigateToNextStep(item), 250);
             });
         }
 
@@ -325,26 +320,33 @@ public class TrickPickerFragment extends Fragment {
         public int getItemCount() { return items.size(); }
 
         class VH extends RecyclerView.ViewHolder {
-            ImageView ivIcon;
-            TextView tvName, tvStars;
+            TextView tvName;
 
             VH(@NonNull View itemView) {
                 super(itemView);
-                ivIcon  = itemView.findViewById(R.id.iv_trick_icon);
-                tvName  = itemView.findViewById(R.id.tv_trick_name);
-                tvStars = itemView.findViewById(R.id.tv_trick_stars);
+                tvName = itemView.findViewById(R.id.tv_trick_name);
             }
         }
     }
 
-    private void navigateToAddTrick(TrickItem item) {
+    private void navigateToNextStep(TrickItem item) {
+        boolean spinEligible = DifficultyEngine.isSpinEligible(item.category);
+        boolean dirEligible  = DifficultyEngine.isDirectionAlwaysEligible(item.category);
+
+        Fragment next;
+        if (spinEligible || dirEligible) {
+            next = SpinPickerFragment.newInstance(terrain, item.name, item.category, presetMeasurement);
+        } else {
+            // MANUAL and other non-spin/non-direction tricks skip the spin screen
+            next = AddTrickFragment.newInstance(terrain, item.name, 0, "", presetMeasurement);
+        }
+
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(
                         R.anim.slide_in_right, R.anim.slide_out_left,
                         R.anim.slide_in_left,  R.anim.slide_out_right)
-                .replace(R.id.homeFragmentContainer,
-                        AddTrickFragment.newInstance(terrain, item.name, item.difficulty))
+                .replace(R.id.homeFragmentContainer, next)
                 .addToBackStack(null)
                 .commit();
     }

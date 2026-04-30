@@ -1,344 +1,264 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F9F9F9">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <!-- Step indicator dots -->
+    <LinearLayout
+        android:id="@+id/ll_step_dots"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="24dp">
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Header -->
-        <TextView
-            android:id="@+id/tv_header"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-black"
-            android:text="Log a Trick"
-            android:textColor="#0A0A0A"
-            android:textSize="40sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <!-- Navigation buttons at bottom -->
+    <LinearLayout
+        android:id="@+id/ll_nav"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="32dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <TextView
-            android:id="@+id/tv_subtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Record your sessions"
-            android:textColor="#5F6369"
-            android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_header" />
-
-        <!-- Trick Name Card -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardTrickName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            app:cardBackgroundColor="@android:color/white"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_subtitle">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/tv_label_trick_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Trick Name"
-                    android:textColor="#0A0A0A"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <EditText
-                    android:id="@+id/et_trick_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/rounded_shadow"
-                    android:clipToOutline="true"
-                    android:elevation="4dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:hint="e.g., First Kickflip"
-                    android:padding="16dp"
-                    android:textColor="#1F1F1F"
-                    android:textColorHint="#5F6369"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_label_trick_name" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Terrain Card -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardTerrain"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="@android:color/white"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardTrickName">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/tv_label_select_terrain"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Select Terrain"
-                    android:textColor="#0A0A0A"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <Button
-                    android:id="@+id/btn_pick_terrain"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:backgroundTint="#111111"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="16dp"
-                    android:stateListAnimator="@null"
-                    android:text="Choose Terrain"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_label_select_terrain" />
-
-                <TextView
-                    android:id="@+id/tv_selected_terrain"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Terrain: None selected"
-                    android:textColor="#5F6369"
-                    android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/btn_pick_terrain" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Measurement fields (outside card, shown/hidden by terrain selection) -->
-        <TextView
-            android:id="@+id/tv_measurement_label"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Height (cm):"
-            android:textColor="#0A0A0A"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardTerrain" />
-
-        <EditText
-            android:id="@+id/et_measurement"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/rounded_shadow"
-            android:clipToOutline="true"
-            android:elevation="4dp"
-            android:fontFamily="sans-serif-medium"
-            android:hint="Enter measurement"
-            android:inputType="number"
-            android:padding="16dp"
-            android:textColor="#1F1F1F"
-            android:textColorHint="#5F6369"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_measurement_label" />
-
-        <!-- Trick Card -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardTrick"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="@android:color/white"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_measurement">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/tv_label_select_trick"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Select Trick"
-                    android:textColor="#0A0A0A"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <Button
-                    android:id="@+id/btn_pick_trick"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:backgroundTint="#111111"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="16dp"
-                    android:stateListAnimator="@null"
-                    android:text="Choose Trick"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_label_select_trick" />
-
-                <TextView
-                    android:id="@+id/tv_selected_trick"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Trick: None selected"
-                    android:textColor="#5F6369"
-                    android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/btn_pick_trick" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Video Card -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardVideo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="@android:color/white"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardTrick">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/tv_label_video"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Add Video"
-                    android:textColor="#0A0A0A"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <Button
-                    android:id="@+id/btn_select_video"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:backgroundTint="#F0F0F0"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="16dp"
-                    android:stateListAnimator="@null"
-                    android:text="Select Video"
-                    android:textColor="#0A0A0A"
-                    android:textSize="15sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_label_video" />
-
-                <TextView
-                    android:id="@+id/tv_video_path"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:ellipsize="end"
-                    android:fontFamily="sans-serif-medium"
-                    android:maxLines="1"
-                    android:text="No video selected"
-                    android:textColor="#9E9E9E"
-                    android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/btn_select_video" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Save Button -->
         <Button
-            android:id="@+id/btn_save_trick"
+            android:id="@+id/btn_back"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:backgroundTint="#111111"
-            android:enabled="true"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="#F0F0F0"
             android:fontFamily="sans-serif-medium"
-            android:padding="16dp"
             android:stateListAnimator="@null"
-            android:text="Save Trick"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardVideo" />
+            android:text="Back"
+            android:textColor="#0A0A0A"
+            android:textSize="15sp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="#111111"
+            android:fontFamily="sans-serif-medium"
+            android:stateListAnimator="@null"
+            android:text="Continue"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- STEP 0: Measurement                                                     -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/step_measurement"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/ll_nav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_step_dots">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/tv_meas_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="How big?"
+                android:textColor="#0A0A0A"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_meas_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#5F6369"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tv_measurement_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#0A0A0A"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_measurement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/rounded_shadow"
+                android:fontFamily="sans-serif-medium"
+                android:hint="Enter number"
+                android:inputType="number"
+                android:padding="16dp"
+                android:textColor="#1F1F1F"
+                android:textColorHint="#9E9E9E"
+                android:textSize="18sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btn_pick_measurement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#F0F0F0"
+                android:fontFamily="sans-serif-medium"
+                android:stateListAnimator="@null"
+                android:text="Select…"
+                android:textColor="#0A0A0A"
+                android:textSize="15sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- STEP 1: Trick name                                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/step_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/ll_nav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_step_dots">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="Name it"
+                android:textColor="#0A0A0A"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Give this trick a nickname"
+                android:textColor="#5F6369"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/et_trick_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/rounded_shadow"
+                android:fontFamily="sans-serif-medium"
+                android:hint="e.g., First Kickflip"
+                android:inputType="textCapSentences"
+                android:maxLines="2"
+                android:padding="16dp"
+                android:textColor="#1F1F1F"
+                android:textColorHint="#9E9E9E"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <!-- STEP 2: Video                                                            -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/step_video"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/ll_nav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_step_dots">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="Any footage?"
+                android:textColor="#0A0A0A"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Add a clip (optional)"
+                android:textColor="#5F6369"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btn_select_video"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:backgroundTint="#F0F0F0"
+                android:fontFamily="sans-serif-medium"
+                android:padding="16dp"
+                android:stateListAnimator="@null"
+                android:text="Select Video"
+                android:textColor="#0A0A0A"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tv_video_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:text="No video selected"
+                android:textColor="#9E9E9E"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

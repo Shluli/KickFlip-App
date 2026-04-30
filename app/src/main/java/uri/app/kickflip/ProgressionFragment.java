@@ -117,15 +117,19 @@ public class ProgressionFragment extends Fragment {
                     for (DocumentSnapshot doc : snap.getDocuments()) {
                         Long m = doc.getLong("measurement");
                         Long d = doc.getLong("difficulty");
+                        Long spin = doc.getLong("spinDegrees");
                         list.add(new VaultFragment.TrickEntry(
                                 doc.getId(),
                                 doc.getString("name"),
                                 doc.getString("trick"),
                                 doc.getString("terrain"),
-                                m != null ? m.intValue() : 0,
-                                d != null ? d.intValue() : 1,
+                                m    != null ? m.intValue()    : 0,
+                                d    != null ? d.intValue()    : 1,
                                 doc.getString("videoPath"),
-                                doc.getString("date")
+                                doc.getString("date"),
+                                spin != null ? spin.intValue() : 0,
+                                doc.getString("direction"),
+                                doc.getString("stance")
                         ));
                     }
                     if (isAdded()) pbLoading.setVisibility(View.GONE);

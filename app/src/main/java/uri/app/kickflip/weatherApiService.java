@@ -1,4 +1,4 @@
-package uri.app.kickflip; // Change this to match your package name
+package uri.app.kickflip;
 
 import android.content.Context;
 import android.os.Handler;
@@ -12,22 +12,17 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import uri.app.kickflip.SkateSpot;
-
 public class weatherApiService {
 
-    // IMPORTANT: Replace this with YOUR API key from OpenWeatherMap
-    private static final String API_KEY = "8fabb613f01c4f04aae5a348d41dc017";
-    private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
+    private static final String API_KEY      = "8fabb613f01c4f04aae5a348d41dc017";
+    private static final String BASE_URL     = "https://api.openweathermap.org/data/2.5/weather";
     private static final String FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
 
-    private ExecutorService executor;
-    private Handler mainHandler;
-    private Context context;
+    private final ExecutorService executor;
+    private final Handler mainHandler;
 
     public weatherApiService(Context context) {
-        this.context = context;
-        this.executor = Executors.newSingleThreadExecutor();
+        this.executor    = Executors.newSingleThreadExecutor();
         this.mainHandler = new Handler(Looper.getMainLooper());
     }
 
@@ -39,38 +34,110 @@ public class weatherApiService {
     public void getWeather(String location, WeatherCallback callback) {
         executor.execute(() -> {
             try {
-                // Get current weather
-                String urlString = BASE_URL + "?q=" + location + "&appid=" + API_KEY + "&units=metric";
-                String response = makeHttpRequest(urlString);
+                // ── Current weather ───────────────────────────────────────────
+                String currentUrl = BASE_URL + "?q=" + location
+                        + "&appid=" + API_KEY + "&units=metric";
+                JSONObject json = new JSONObject(makeHttpRequest(currentUrl));
 
-                JSONObject json = new JSONObject(response);
-
-                // Parse current weather
                 String locationName = json.getString("name");
-                double temp = json.getJSONObject("main").getDouble("temp");
-                double humidity = json.getJSONObject("main").getDouble("humidity");
 
-                JSONArray weatherArray = json.getJSONArray("weather");
-                String condition = weatherArray.getJSONObject(0).getString("main");
-                String description = weatherArray.getJSONObject(0).getString("description");
+                JSONObject main = json.getJSONObject("main");
+                double temp     = main.getDouble("temp");
+                double humidity = main.getDouble("humidity");
 
-                boolean isRaining = condition.equalsIgnoreCase("Rain") ||
-                        condition.equalsIgnoreCase("Drizzle") ||
-                        condition.equalsIgnoreCase("Thunderstorm");
+                JSONArray weatherArr = json.getJSONArray("weather");
+                String condition    = weatherArr.getJSONObject(0).getString("main");
+                String description  = weatherArr.getJSONObject(0).getString("description");
 
-                // Get forecast to check for recent rain
-                String forecastUrlString = FORECAST_URL + "?q=" + location + "&appid=" + API_KEY + "&units=metric";
-                String forecastResponse = makeHttpRequest(forecastUrlString);
+                boolean isRaining = condition.equalsIgnoreCase("Rain")
+                        || condition.equalsIgnoreCase("Drizzle")
+                        || condition.equalsIgnoreCase("Thunderstorm")
+                        || condition.equalsIgnoreCase("Snow");
 
-                long lastRainTime = findLastRainTime(forecastResponse);
+                // ── Wind (m/s) ────────────────────────────────────────────────
+                double windSpeedMs = 0;
+                JSONObject windObj = json.optJSONObject("wind");
+                if (windObj != null) windSpeedMs = windObj.optDouble("speed", 0);
 
-                // Create SkateSpot object
+                // ── Cloud cover (%) ───────────────────────────────────────────
+                int cloudCoverPct = 0;
+                JSONObject cloudsObj = json.optJSONObject("clouds");
+                if (cloudsObj != null) cloudCoverPct = cloudsObj.optInt("all", 0);
+
+                // ── Recent rainfall (mm) ──────────────────────────────────────
+                // rain.1h = mm in last 60 min; rain.3h = mm in last 3 h
+                double rain1h = 0, rain3h = 0;
+                JSONObject rainObj = json.optJSONObject("rain");
+                if (rainObj != null) {
+                    rain1h = rainObj.optDouble("1h", 0);
+                    rain3h = rainObj.optDouble("3h", 0);
+                }
+                // Snow is also wet ground
+                JSONObject snowObj = json.optJSONObject("snow");
+                if (snowObj != null) {
+                    rain1h += snowObj.optDouble("1h", 0);
+                    rain3h += snowObj.optDouble("3h", 0);
+                }
+
+                // ── Daytime flag ──────────────────────────────────────────────
+                boolean isDaytime = true;
+                JSONObject sysObj = json.optJSONObject("sys");
+                if (sysObj != null) {
+                    long sunrise = sysObj.optLong("sunrise", 0) * 1000L;
+                    long sunset  = sysObj.optLong("sunset",  0) * 1000L;
+                    if (sunrise > 0 && sunset > 0) {
+                        long nowMs = System.currentTimeMillis();
+                        isDaytime = nowMs >= sunrise && nowMs <= sunset;
+                    }
+                }
+
+                // ── Forecast (for historical rain fallback) ───────────────────
+                String forecastUrl = FORECAST_URL + "?q=" + location
+                        + "&appid=" + API_KEY + "&units=metric";
+                String forecastResponse = makeHttpRequest(forecastUrl);
+
+                // ── Derive lastRainTimestamp + totalRainMm ────────────────────
+                long nowMs = System.currentTimeMillis();
+                long lastRainTime;
+                double totalRainMm;
+
+                if (isRaining) {
+                    // Currently raining: rain started at most 1h ago; use 1h/3h data
+                    lastRainTime = nowMs;
+                    totalRainMm = Math.max(rain1h, rain3h);
+                    if (totalRainMm == 0) totalRainMm = 1.0; // API sometimes omits small values
+
+                } else if (rain1h > 0) {
+                    // Rained in the last hour but stopped; midpoint = ~30 min ago
+                    lastRainTime = nowMs - 30L * 60 * 1000;
+                    totalRainMm  = rain3h > 0 ? rain3h : rain1h;
+
+                } else if (rain3h > 0) {
+                    // Rained 1–3 h ago; midpoint = ~1.5 h ago
+                    lastRainTime = nowMs - 90L * 60 * 1000;
+                    totalRainMm  = rain3h;
+
+                } else {
+                    // No recent rain in current-weather data; scan forecast history
+                    RainData rd  = findRainDataFromForecast(forecastResponse, nowMs);
+                    lastRainTime = rd.lastRainTime;
+                    totalRainMm  = rd.totalRainMm;
+                }
+
+                // ── Build SkateSpot ───────────────────────────────────────────
                 SkateSpot spot = new SkateSpot(locationName);
                 spot.setTemperature(temp);
                 spot.setWeatherCondition(description);
-                spot.calculateGroundStatus(isRaining, lastRainTime, temp, humidity);
+                spot.calculateGroundStatus(
+                        isRaining,
+                        lastRainTime,
+                        totalRainMm,
+                        temp,
+                        humidity,
+                        windSpeedMs,
+                        cloudCoverPct,
+                        isDaytime);
 
-                // Return on main thread
                 mainHandler.post(() -> callback.onSuccess(spot));
 
             } catch (Exception e) {
@@ -80,73 +147,89 @@ public class weatherApiService {
         });
     }
 
-    private String makeHttpRequest(String urlString) throws Exception {
-        URL url = new URL(urlString);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setConnectTimeout(10000);
-        connection.setReadTimeout(10000);
+    // ── Rain history from forecast ────────────────────────────────────────────
 
-        int responseCode = connection.getResponseCode();
-        if (responseCode != 200) {
-            throw new Exception("API Error: " + responseCode);
-        }
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String line;
-
-        while ((line = reader.readLine()) != null) {
-            response.append(line);
-        }
-
-        reader.close();
-        connection.disconnect();
-
-        return response.toString();
+    /** Lightweight holder returned by findRainDataFromForecast. */
+    private static class RainData {
+        final long   lastRainTime;
+        final double totalRainMm;
+        RainData(long t, double mm) { lastRainTime = t; totalRainMm = mm; }
     }
 
-    private long findLastRainTime(String forecastJson) {
+    /**
+     * Scans the 5-day/3-h forecast for precipitation near or before the current
+     * time.  The OWM forecast list starts at the current 3-hour block, so items
+     * with dt ≤ now are genuine past/current observations; items slightly in the
+     * future (within one interval) are also counted because their rain.3h window
+     * overlaps the present.
+     */
+    private RainData findRainDataFromForecast(String forecastJson, long nowMs) {
+        long   lastRainTime = 0;
+        double totalRainMm  = 0;
+
         try {
-            JSONObject forecast = new JSONObject(forecastJson);
-            JSONArray list = forecast.getJSONArray("list");
+            JSONArray list = new JSONObject(forecastJson).getJSONArray("list");
 
-            long currentTime = System.currentTimeMillis();
-            long lastRainTime = 0;
+            // One 3-hour window is 10 800 000 ms; scan up to 48 h back
+            long windowMs = 3L * 3600 * 1000;
 
-            // Check last 24 hours of forecast data
-            for (int i = 0; i < Math.min(list.length(), 8); i++) { // 8 x 3-hour intervals = 24 hours
+            for (int i = 0; i < Math.min(list.length(), 16); i++) {
                 JSONObject item = list.getJSONObject(i);
-                long timestamp = item.getLong("dt") * 1000; // Convert to milliseconds
+                long dt = item.getLong("dt") * 1000L;
 
-                if (timestamp > currentTime) {
-                    continue; // Skip future forecasts
-                }
+                // Stop scanning once we're more than one window into the future
+                if (dt > nowMs + windowMs) break;
 
-                JSONArray weather = item.getJSONArray("weather");
-                String main = weather.getJSONObject(0).getString("main");
+                JSONArray weatherArr = item.optJSONArray("weather");
+                if (weatherArr == null || weatherArr.length() == 0) continue;
 
-                if (main.equalsIgnoreCase("Rain") ||
-                        main.equalsIgnoreCase("Drizzle") ||
-                        main.equalsIgnoreCase("Thunderstorm")) {
+                String itemMain = weatherArr.getJSONObject(0).getString("main");
+                boolean hadRain = itemMain.equalsIgnoreCase("Rain")
+                        || itemMain.equalsIgnoreCase("Drizzle")
+                        || itemMain.equalsIgnoreCase("Thunderstorm")
+                        || itemMain.equalsIgnoreCase("Snow");
 
-                    if (timestamp > lastRainTime) {
-                        lastRainTime = timestamp;
-                    }
-                }
+                if (!hadRain) continue;
+
+                if (dt > lastRainTime) lastRainTime = dt;
+
+                JSONObject rain = item.optJSONObject("rain");
+                if (rain != null) totalRainMm += rain.optDouble("3h", 0);
+
+                JSONObject snow = item.optJSONObject("snow");
+                if (snow != null) totalRainMm += snow.optDouble("3h", 0);
             }
-
-            return lastRainTime;
-
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
         }
+
+        return new RainData(lastRainTime, totalRainMm);
+    }
+
+    // ── HTTP helper ───────────────────────────────────────────────────────────
+
+    private String makeHttpRequest(String urlString) throws Exception {
+        HttpURLConnection conn = (HttpURLConnection) new URL(urlString).openConnection();
+        conn.setRequestMethod("GET");
+        conn.setConnectTimeout(10_000);
+        conn.setReadTimeout(10_000);
+
+        if (conn.getResponseCode() != 200) {
+            throw new Exception("API Error: " + conn.getResponseCode());
+        }
+
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader =
+                     new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line);
+        } finally {
+            conn.disconnect();
+        }
+        return sb.toString();
     }
 
     public void shutdown() {
-        if (executor != null) {
-            executor.shutdown();
-        }
+        if (executor != null) executor.shutdown();
     }
 }

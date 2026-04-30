@@ -1,8 +1,12 @@
 package uri.app.kickflip;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,7 +15,7 @@ import java.util.List;
 public class TrickAdapter extends RecyclerView.Adapter<TrickAdapter.TrickViewHolder> {
 
     private List<VaultFragment.TrickEntry> trickList;
-    private OnTrickClickListener listener;
+    private final OnTrickClickListener listener;
 
     public interface OnTrickClickListener {
         void onTrickClick(VaultFragment.TrickEntry trick);
@@ -20,7 +24,7 @@ public class TrickAdapter extends RecyclerView.Adapter<TrickAdapter.TrickViewHol
 
     public TrickAdapter(List<VaultFragment.TrickEntry> trickList, OnTrickClickListener listener) {
         this.trickList = trickList;
-        this.listener = listener;
+        this.listener  = listener;
     }
 
     @NonNull
@@ -33,102 +37,91 @@ public class TrickAdapter extends RecyclerView.Adapter<TrickAdapter.TrickViewHol
 
     @Override
     public void onBindViewHolder(@NonNull TrickViewHolder holder, int position) {
-        VaultFragment.TrickEntry trick = trickList.get(position);
-        holder.bind(trick, listener);
+        holder.bind(trickList.get(position), listener);
     }
 
     @Override
-    public int getItemCount() {
-        return trickList.size();
-    }
+    public int getItemCount() { return trickList.size(); }
 
     static class TrickViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvTrickName;
-        private TextView tvTrickType;
-        private TextView tvTerrainInfo;
-        private TextView tvDate;
-        private TextView tvDifficulty;
-        private View ivVideoIndicator;
-        private View difficultyBar;
+        private final TextView  tvModifier;
+        private final TextView  tvTrickName;
+        private final TextView  tvTerrainMeas;
+        private final TextView  tvDate;
+        private final ImageView ivDifficultyIcon;
+        private final View      ivVideoDot;
+        private final View      vBorderOverlay;
 
-        public TrickViewHolder(@NonNull View itemView) {
+        TrickViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTrickName = itemView.findViewById(R.id.tv_trick_name);
-            tvTrickType = itemView.findViewById(R.id.tv_trick_type);
-            tvTerrainInfo = itemView.findViewById(R.id.tv_terrain_info);
-            tvDate = itemView.findViewById(R.id.tv_date);
-            tvDifficulty = itemView.findViewById(R.id.tv_difficulty);
-            ivVideoIndicator = itemView.findViewById(R.id.iv_video_indicator);
-            difficultyBar = itemView.findViewById(R.id.difficulty_bar);
+            tvModifier       = itemView.findViewById(R.id.tv_modifier);
+            tvTrickName      = itemView.findViewById(R.id.tv_trick_name);
+            tvTerrainMeas    = itemView.findViewById(R.id.tv_terrain_meas);
+            tvDate           = itemView.findViewById(R.id.tv_date);
+            ivDifficultyIcon = itemView.findViewById(R.id.iv_difficulty_icon);
+            ivVideoDot       = itemView.findViewById(R.id.iv_video_dot);
+            vBorderOverlay   = itemView.findViewById(R.id.v_border_overlay);
         }
 
-        public void bind(VaultFragment.TrickEntry trick, OnTrickClickListener listener) {
+        void bind(VaultFragment.TrickEntry trick, OnTrickClickListener listener) {
             tvTrickName.setText(trick.name);
-            tvTrickType.setText(trick.trick);
-            
-            // Build terrain info string
-            String terrainInfo = trick.terrain;
-            if (trick.measurement > 0) {
-                if (trick.terrain.equals("Stairs")) {
-                    terrainInfo += " (" + trick.measurement + " stairs)";
-                } else if (trick.terrain.equals("Gap")) {
-                    terrainInfo += " (" + trick.measurement + "cm length)";
-                } else {
-                    terrainInfo += " (" + trick.measurement + "cm)";
-                }
-            }
-            tvTerrainInfo.setText(terrainInfo);
-            
-            // Format date (show just date, not time)
+            tvTerrainMeas.setText(buildTerrainLabel(trick));
+            tvModifier.setText(buildModifier(trick));
+
             String dateStr = trick.date != null ? trick.date : "";
-            if (dateStr.contains(" ")) {
-                dateStr = dateStr.split(" ")[0];
-            }
+            if (dateStr.contains(" ")) dateStr = dateStr.split(" ")[0];
             tvDate.setText(dateStr);
-            
-            // Display difficulty
-            tvDifficulty.setText(String.valueOf(trick.difficulty));
-            setDifficultyColor(trick.difficulty);
-            
-            // Show video indicator if video exists
-            if (trick.videoPath != null && !trick.videoPath.isEmpty()) {
-                ivVideoIndicator.setVisibility(View.VISIBLE);
-            } else {
-                ivVideoIndicator.setVisibility(View.GONE);
-            }
-            
-            // Click listeners
+
+            ivVideoDot.setVisibility(
+                    trick.videoPath != null && !trick.videoPath.isEmpty()
+                    ? View.VISIBLE : View.GONE);
+
+            applyDifficulty(trick.difficulty);
+
             itemView.setOnClickListener(v -> listener.onTrickClick(trick));
-            itemView.setOnLongClickListener(v -> {
-                listener.onTrickLongClick(trick);
-                return true;
-            });
+            itemView.setOnLongClickListener(v -> { listener.onTrickLongClick(trick); return true; });
         }
 
-        private void setDifficultyColor(int difficulty) {
-            int color;
-            switch (difficulty) {
-                case 1:
-                    color = 0xFF4CAF50; // Green - Easy
-                    break;
-                case 2:
-                    color = 0xFF8BC34A; // Light Green
-                    break;
-                case 3:
-                    color = 0xFFFFC107; // Yellow - Medium
-                    break;
-                case 4:
-                    color = 0xFFFF9800; // Orange
-                    break;
-                case 5:
-                    color = 0xFFF44336; // Red - Hard
-                    break;
-                default:
-                    color = 0xFF9E9E9E; // Gray
+        // "180° Fakie BS"  /  "Switch FS"  /  "BS"  — empty string if nothing applies
+        private String buildModifier(VaultFragment.TrickEntry trick) {
+            StringBuilder sb = new StringBuilder();
+            if (trick.spinDegrees > 0) sb.append(trick.spinDegrees).append("° ");
+            String st = trick.stance;
+            if (st != null && !st.isEmpty() && !"Regular".equals(st)) sb.append(st).append(" ");
+            String dir = trick.direction;
+            if (dir != null && !dir.isEmpty()) {
+                sb.append("Backside".equals(dir) ? "BS" : "FS");
             }
-            
-            tvDifficulty.setTextColor(color);
-            difficultyBar.setBackgroundColor(color);
+            return sb.toString().trim();
+        }
+
+        private String buildTerrainLabel(VaultFragment.TrickEntry trick) {
+            String meas = DifficultyEngine.getMeasurementLabel(trick.terrain, trick.measurement);
+            return meas.isEmpty() ? trick.terrain : trick.terrain + " · " + meas;
+        }
+
+        private void applyDifficulty(int score) {
+            int rank  = DifficultyEngine.getRank(score);
+            int color = DifficultyEngine.getRankColor(score);
+
+            // Icon shape: circle (Bronze–Gold), diamond (Diamond), triangle (Epic–Legendary)
+            int iconRes;
+            if (rank <= DifficultyEngine.RANK_GOLD)      iconRes = R.drawable.ic_shape_circle;
+            else if (rank == DifficultyEngine.RANK_DIAMOND) iconRes = R.drawable.ic_shape_diamond;
+            else                                          iconRes = R.drawable.ic_shape_triangle;
+
+            ivDifficultyIcon.setImageResource(iconRes);
+            ivDifficultyIcon.setImageTintList(ColorStateList.valueOf(color));
+
+            // Colored stroke border overlay
+            float radius = itemView.getResources().getDisplayMetrics().density * 14;
+            int   stroke = Math.round(itemView.getResources().getDisplayMetrics().density * 4);
+            GradientDrawable border = new GradientDrawable();
+            border.setShape(GradientDrawable.RECTANGLE);
+            border.setCornerRadius(radius);
+            border.setStroke(stroke, color);
+            border.setColor(Color.TRANSPARENT);
+            vBorderOverlay.setBackground(border);
         }
     }
 

@@ -23,14 +23,14 @@
         android:layout_height="36dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/circle_dark"
         android:clickable="true"
         android:elevation="2dp"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         android:gravity="center"
-        android:text="👤"
-        android:textSize="15sp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#111111"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -111,7 +111,6 @@
                 android:layout_height="3dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="-3dp"
-                android:background="@drawable/pill_indicator"
                 android:visibility="gone" />
 
             <ImageView

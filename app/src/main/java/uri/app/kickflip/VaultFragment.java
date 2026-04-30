@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +35,7 @@ public class VaultFragment extends Fragment {
     private TextView tvEmptyState;
     private ProgressBar pbLoading;
     private FloatingActionButton fabAddTrick;
-    private Button btnSort;
+    private ImageButton btnSort;
     private List<TrickEntry> trickList;
     private ListenerRegistration snapshotListener;
 
@@ -80,7 +81,7 @@ public class VaultFragment extends Fragment {
             }
         });
 
-        recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 3));
         recyclerView.setAdapter(adapter);
     }
 
@@ -138,8 +139,9 @@ public class VaultFragment extends Fragment {
 
                     trickList.clear();
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                        Long measurement = doc.getLong("measurement");
-                        Long difficulty  = doc.getLong("difficulty");
+                        Long measurement  = doc.getLong("measurement");
+                        Long difficulty   = doc.getLong("difficulty");
+                        Long spinDegrees  = doc.getLong("spinDegrees");
                         trickList.add(new TrickEntry(
                                 doc.getId(),
                                 doc.getString("name"),
@@ -148,7 +150,10 @@ public class VaultFragment extends Fragment {
                                 measurement != null ? measurement.intValue() : 0,
                                 difficulty  != null ? difficulty.intValue()  : 1,
                                 doc.getString("videoPath"),
-                                doc.getString("date")
+                                doc.getString("date"),
+                                spinDegrees != null ? spinDegrees.intValue() : 0,
+                                doc.getString("direction"),
+                                doc.getString("stance")
                         ));
                     }
                     adapter.notifyDataSetChanged();
@@ -188,8 +193,9 @@ public class VaultFragment extends Fragment {
                         ? trick.terrain + " (" + trick.measurement + "cm)"
                         : trick.terrain
         );
-        ((TextView) sheetView.findViewById(R.id.dialog_tv_difficulty))
-                .setText(String.valueOf(trick.difficulty));
+        TextView tvDiff = sheetView.findViewById(R.id.dialog_tv_difficulty);
+        tvDiff.setText(DifficultyEngine.getRankName(trick.difficulty) + "  (" + trick.difficulty + ")");
+        tvDiff.setTextColor(DifficultyEngine.getRankColor(trick.difficulty));
         ((TextView) sheetView.findViewById(R.id.dialog_tv_date)).setText(trick.date);
 
         boolean hasVideo = trick.videoPath != null && !trick.videoPath.isEmpty();
@@ -248,16 +254,21 @@ public class VaultFragment extends Fragment {
 
     public static class TrickEntry {
         public String docId, name, trick, terrain, videoPath, date;
-        public int measurement, difficulty;
+        public int measurement, difficulty, spinDegrees;
+        public String direction, stance;
 
         public TrickEntry() {} // Required empty constructor for Firebase
 
         public TrickEntry(String docId, String name, String trick, String terrain,
-                          int measurement, int difficulty, String videoPath, String date) {
+                          int measurement, int difficulty, String videoPath, String date,
+                          int spinDegrees, String direction, String stance) {
             this.docId = docId;
             this.name = name; this.trick = trick; this.terrain = terrain;
             this.measurement = measurement; this.difficulty = difficulty;
             this.videoPath = videoPath; this.date = date;
+            this.spinDegrees = spinDegrees;
+            this.direction = direction != null ? direction : "";
+            this.stance    = stance     != null ? stance     : "Regular";
         }
     }
 }

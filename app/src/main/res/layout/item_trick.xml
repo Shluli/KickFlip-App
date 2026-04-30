@@ -4,118 +4,129 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
-    android:background="@android:color/white"
-    android:clickable="true"
-    android:elevation="4dp"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackground"
-    android:minHeight="80dp"
-    android:outlineProvider="bounds">
+    android:layout_margin="4dp">
 
-    <!-- Difficulty color bar on left edge -->
-    <View
-        android:id="@+id/difficulty_bar"
-        android:layout_width="4dp"
-        android:layout_height="0dp"
-        android:background="#FF9800"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_root"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Video indicator dot -->
-    <View
-        android:id="@+id/iv_video_indicator"
-        android:layout_width="8dp"
-        android:layout_height="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:background="#4CAF50"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Difficulty badge -->
-    <TextView
-        android:id="@+id/tv_difficulty"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/difficulty_badge"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center"
-        android:text="4"
-        android:textColor="#FF9800"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="7dp">
 
-    <!-- Trick name -->
-    <TextView
-        android:id="@+id/tv_trick_name"
+            <!-- Modifier / spin label (top-left): e.g. "180 Fakie BS" -->
+            <TextView
+                android:id="@+id/tv_modifier"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:maxLines="1"
+                android:text="180 Fakie BS"
+                android:textColor="#0A0A0A"
+                android:textSize="9sp"
+                app:layout_constraintEnd_toStartOf="@id/iv_video_dot"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Video indicator dot (top-right) -->
+            <View
+                android:id="@+id/iv_video_dot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginStart="2dp"
+                android:background="#0A0A0A"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Trick name -->
+            <TextView
+                android:id="@+id/tv_trick_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+
+                android:maxLines="2"
+                android:text="Kick Flip"
+                android:gravity="center"
+                android:textColor="#0A0A0A"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_modifier" />
+
+            <!-- Terrain / measurement label -->
+            <TextView
+                android:id="@+id/tv_terrain_meas"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:text="4 Stair"
+                android:textColor="#0A0A0A"
+                android:textSize="9sp"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_trick_name" />
+
+            <!-- Difficulty icon -->
+            <ImageView
+                android:id="@+id/iv_difficulty_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:contentDescription="Difficulty"
+                android:src="@drawable/ic_shape_diamond"
+                app:layout_constraintBottom_toTopOf="@id/tv_date"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_terrain_meas" />
+
+            <!-- Date (bottom-center) -->
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:text="6/7/2026"
+                android:textColor="#888888"
+                android:textSize="9sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <View
+        android:id="@+id/v_border_overlay"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="10dp"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif-medium"
-        android:maxLines="2"
-        android:text="First Kickflip"
-        android:textColor="#0A0A0A"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/tv_difficulty"
-        app:layout_constraintStart_toEndOf="@id/difficulty_bar"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Trick type -->
-    <TextView
-        android:id="@+id/tv_trick_type"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="2dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Kickflip"
-        android:textColor="#3B82F6"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toStartOf="@id/tv_difficulty"
-        app:layout_constraintStart_toEndOf="@id/difficulty_bar"
-        app:layout_constraintTop_toBottomOf="@id/tv_trick_name" />
-
-    <!-- Terrain info -->
-    <TextView
-        android:id="@+id/tv_terrain_info"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="2dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Flatground"
-        android:textColor="#5F6369"
-        android:textSize="11sp"
-        app:layout_constraintEnd_toStartOf="@id/tv_difficulty"
-        app:layout_constraintStart_toEndOf="@id/difficulty_bar"
-        app:layout_constraintTop_toBottomOf="@id/tv_trick_type" />
-
-    <!-- Date -->
-    <TextView
-        android:id="@+id/tv_date"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="10dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="2024-02-20"
-        android:textColor="#9E9E9E"
-        android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/tv_difficulty"
-        app:layout_constraintStart_toEndOf="@id/difficulty_bar"
-        app:layout_constraintTop_toBottomOf="@id/tv_terrain_info" />
+        android:layout_height="0dp"
+        android:clickable="false"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="@id/card_root"
+        app:layout_constraintEnd_toEndOf="@id/card_root"
+        app:layout_constraintStart_toStartOf="@id/card_root"
+        app:layout_constraintTop_toTopOf="@id/card_root" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

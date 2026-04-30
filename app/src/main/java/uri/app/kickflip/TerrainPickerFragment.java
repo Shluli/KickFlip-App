@@ -48,6 +48,9 @@ public class TerrainPickerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_terrain_picker, container, false);
+        view.findViewById(R.id.btn_back).setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager().popBackStack());
+
         RecyclerView rv = view.findViewById(R.id.rv_terrain);
         rv.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         rv.setAdapter(new CategoryAdapter());

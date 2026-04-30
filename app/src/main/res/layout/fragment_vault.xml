@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F9F9F9">
@@ -18,72 +19,61 @@
         android:textColor="#0A0A0A"
         android:textSize="40sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/btn_sort"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Sort Button -->
-    <Button
-        android:id="@+id/btn_sort"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:backgroundTint="#111111"
-        android:fontFamily="sans-serif-medium"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:stateListAnimator="@null"
-        android:text="Sort"
-        android:textColor="#FFFFFF"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvVaultTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvVaultTitle" />
 
     <!-- Subtitle -->
-    <TextView
-        android:id="@+id/tvVaultSubtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="4dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Your trick history"
-        android:textColor="#5F6369"
-        android:textSize="15sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvVaultTitle" />
 
     <!-- Tricks Grid -->
+
+    <!-- Loading spinner -->
+
+    <ImageButton
+        android:id="@+id/btn_sort"
+        android:layout_width="33dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="52dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="Sort"
+        android:padding="0dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_stats"
+        app:layout_constraintStart_toEndOf="@+id/tvVaultTitle"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_tricks"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="40dp"
         android:clipToPadding="false"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:paddingBottom="88dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvVaultSubtitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvVaultTitle"
+        app:layout_constraintVertical_bias="1.0" />
 
-    <!-- Loading spinner -->
+    <!-- Empty State -->
+
     <ProgressBar
         android:id="@+id/pb_loading"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginBottom="400dp"
         android:indeterminateTint="#111111"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvVaultSubtitle" />
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Empty State -->
     <TextView
         android:id="@+id/tv_empty_state"
         android:layout_width="0dp"
@@ -98,18 +88,19 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvVaultSubtitle" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_trick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="28dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="64dp"
+        app:maxImageSize="70dp"
+        app:useCompatPadding="false"
         android:contentDescription="Add Trick"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@drawable/vaultdoor"
         app:backgroundTint="#111111"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

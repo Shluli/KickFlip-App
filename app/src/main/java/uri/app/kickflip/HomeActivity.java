@@ -90,6 +90,10 @@ public class HomeActivity extends AppCompatActivity {
                 active ? 0xFF111111 : 0xFFAAAAAA));
     }
 
+    public void switchToVault() {
+        selectTab(TAB_VAULT);
+    }
+
     private void refreshAvatar() {
         SharedPreferences prefs = getSharedPreferences("kickflip_profile", MODE_PRIVATE);
         String name = prefs.getString("display_name", null);
