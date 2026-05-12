@@ -2,6 +2,8 @@ package uri.app.kickflip;
 
 public class SkateSpot {
 
+    // Final means it cannot be reset to another value
+
     public static final int STATUS_DRY    = 0;
     public static final int STATUS_DRYING = 1;
     public static final int STATUS_WET    = 2;
@@ -21,10 +23,12 @@ public class SkateSpot {
     private int    dryEtaMinutes; // -1 = raining; 0 = already dry
     private String firestoreDocId;
 
+    //constructor
     public SkateSpot(String locationName) {
         this.locationName = locationName;
     }
 
+    // Calculates if ground is wet
     public void calculateGroundStatus(
             boolean isRaining,
             long    lastRainTimestamp,
@@ -42,6 +46,7 @@ public class SkateSpot {
         this.windSpeedMs      = windSpeedMs;
         this.cloudCoverPct    = cloudCoverPct;
 
+        // Complicated physics stuff, calculate if pavement specificly is dry using complex formula
 
         // Saturation vapour pressure (kPa) via Tetens formula
         double es = 0.6108 * Math.exp(17.27 * temp / (temp + 237.3));
@@ -58,22 +63,23 @@ public class SkateSpot {
             double clearSkyFraction = 1.0 - cloudCoverPct / 100.0;
             radFactor = 1.5 + 2.0 * clearSkyFraction;  // 1.5 (overcast) → 3.5 (clear)
         } else {
-            radFactor = 0.8;  // night: no solar, slower but non-zero evaporation
+            radFactor = 0.8;  // night
         }
 
         // Final evaporation rate (mm/hr), calibrated constant K=0.30 for sealed pavement
         double evapRateMmPerHr = Math.max(0.02, 0.30 * vpd * windFactor * radFactor);
 
-        // ── 2. WATER RETAINED ON PAVEMENT ────────────────────────────────────
+        //  WATER RETAINED ON PAVEMENT
 
-        // Retention fraction decreases at higher rain volumes as drainage takes over
+        // Gotta calc how much it rained aswell
         double retentionRate  = Math.max(0.25, 0.55 - 0.015 * totalRecentRainMm);
         double waterRetainedMm = (totalRecentRainMm > 0)
                 ? Math.min(totalRecentRainMm * retentionRate, 5.0)
                 : 0.0;
 
-        // ── 3. STATUS DETERMINATION ───────────────────────────────────────────
+        // La Finale
 
+        // obv if its raining dont go
         if (isRaining) {
             groundStatus      = "Wet — stay off";
             groundSubtitle    = "Raining now";
@@ -83,6 +89,7 @@ public class SkateSpot {
             return;
         }
 
+        // If its humid as hell might aswell stay home
         if (waterRetainedMm <= 0 || lastRainTimestamp == 0) {
             if (humidity >= 95) {
                 // Near-saturation air: surface may be damp from condensation
@@ -101,14 +108,13 @@ public class SkateSpot {
             return;
         }
 
-        // How much water has already evaporated since rain stopped?
+        // How much water has already evaporated since rain stopped
         double hoursElapsed    = Math.max(0.0,
                 (System.currentTimeMillis() - lastRainTimestamp) / 3_600_000.0);
         double waterEvaporated = evapRateMmPerHr * hoursElapsed;
         double waterRemaining  = Math.max(0.0, waterRetainedMm - waterEvaporated);
 
-        if (waterRemaining <= 0.05) {
-            // Effectively dry (< 0.05 mm residual film)
+        if (waterRemaining <= 0.05) { // if tehres no water left
             groundStatus      = "Go skate.";
             groundSubtitle    = "Ground is dry";
             groundStatusLevel = STATUS_DRY;
@@ -124,7 +130,7 @@ public class SkateSpot {
             double hoursRemaining = waterRemaining / evapRateMmPerHr;
             dryEtaMinutes = (int) Math.ceil(hoursRemaining * 60);
 
-            // Still very wet (>70% of retained water remains) vs just drying
+            // Gotta check HOW wet it is
             if (waterRemaining > waterRetainedMm * 0.70) {
                 groundStatus      = "Wet — wait";
                 groundStatusLevel = STATUS_WET;
@@ -141,7 +147,7 @@ public class SkateSpot {
             lastRainInfo   = etaStr + " · " + String.format("%.1f", totalRecentRainMm) + "mm rain";
         }
     }
-
+    // Getters and setters back
     public String  getLocationName()     { return locationName; }
     public double  getTemperature()      { return temperature; }
     public String  getWeatherCondition() { return weatherCondition; }

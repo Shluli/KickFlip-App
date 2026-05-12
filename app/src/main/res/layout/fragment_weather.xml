@@ -57,15 +57,28 @@
                 android:textColorHint="#5F6369"
                 android:textSize="15sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btnAddLocation"
+                app:layout_constraintEnd_toStartOf="@+id/btnMyLocation"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/btnMyLocation"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/circle_black"
+                android:contentDescription="Use my location"
+                android:padding="14dp"
+                android:src="@drawable/ic_map_pin"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnAddLocation"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/btnAddLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="8dp"
                 android:backgroundTint="#111111"
                 android:fontFamily="sans-serif-medium"
                 android:paddingStart="20dp"

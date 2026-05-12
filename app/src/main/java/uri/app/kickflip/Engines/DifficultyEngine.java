@@ -3,39 +3,30 @@ package uri.app.kickflip;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Difficulty scoring system: score = clamp(round(trickBase × terrainMultiplier), 0, 100)
- *
- * WHY MULTIPLICATIVE (not additive):
- *   - Additive: easy trick (base 15) + huge stairs (+35) = 50. Hard trick (base 46) + flat (+0) = 46.
- *     That says a huge-stairs ollie is harder than a flat tre flip — arguably wrong.
- *   - Multiplicative: ollie × 2.3 = 34 (Gold cap for ollie). Tre flip × 2.3 = 106 → capped at 100.
- *     Each trick's ceiling is naturally bounded by its own base. You can't inflate rank by
- *     pairing a beginner trick with impossible terrain.
- *
- * ANTI-MANIPULATION GUARANTEES:
- *   - Max practical multiplier ≈ 2.30 (huge quarter pipe or ~20 stairs).
- *   - Ollie (base 15) × 2.30 = 34 → Silver max. Ollie can NEVER reach Diamond.
- *   - Diamond requires base ≥ 24.  Epic requires base ≥ 31.  Legendary requires base ≥ 38.
- *
- * RANK THRESHOLDS:
- *   Bronze 0–20 · Silver 21–35 · Gold 36–54 · Diamond 55–70 · Epic 71–85 · Legendary 86–100
- *
- * TEN EXAMPLE CALCULATIONS:
- *   1. Ollie  × flat(1.00)           = 15  → Bronze
- *   2. Kickflip × flat(1.00)         = 28  → Silver
- *   3. Treflip × flat(1.00)          = 46  → Gold
- *   4. Ollie × 5-stairs(1.68)        = 25  → Silver
- *   5. Kickflip × 5-stairs(1.68)     = 47  → Gold
- *   6. Kickflip × low-ledge(1.25)    = 35  → Silver (grind technique adds challenge)
- *   7. Bluntslide × high-ledge(1.55) = 65  → Diamond
- *   8. Treflip × 5-stairs(1.68)      = 77  → Epic
- *   9. Noseblunt × QP-huge(2.10)     = 92  → Legendary
- *  10. Treflip × 10-stairs(2.05)     = 94  → Legendary
- */
+ // So, this is my dif system, basiclly takes the trick u did, and what u did it on, and
+ // calculates if its good or no, score out of 1-100 and ranks it in the ranks,
+ //
+ // Hot out the oven examples for ranks:
+ //   1. Ollie  × flat(1.00)           = 15  → Bronze
+ //   2. Kickflip × flat(1.00)         = 28  → Silver
+ //   3. Treflip × flat(1.00)          = 46  → Gold
+ //   4. Ollie × 5-stairs(1.68)        = 25  → Silver
+ //   5. Kickflip × 5-stairs(1.68)     = 47  → Gold
+ //   6. Kickflip × low-ledge(1.25)    = 35  → Silver (grind technique adds challenge)
+ //   7. Bluntslide × high-ledge(1.55) = 65  → Diamond
+ //   8. Treflip × 5-stairs(1.68)      = 77  → Epic
+ //   9. Noseblunt × QP-huge(2.10)     = 92  → Legendary
+ //  10. Treflip × 10-stairs(2.05)     = 94  → Legendary
+ //
+ //  tons of stuff to make sure nothing is overpowered, like you cant just extend your grind to 20m and become a
+ //  legend, and you cant just ollie like 7 stairs and its harder than a treaflip on bank.
+ //
+ //  oh and for some obstacles u gotta input a measurement, like how many stairs.
+ //
+
 public class DifficultyEngine {
 
-    // ── Rank constants ────────────────────────────────────────────────────────
+    // ranks constants
     public static final int RANK_BRONZE    = 0;
     public static final int RANK_SILVER    = 1;
     public static final int RANK_GOLD      = 2;
@@ -43,7 +34,7 @@ public class DifficultyEngine {
     public static final int RANK_EPIC      = 4;
     public static final int RANK_LEGENDARY = 5;
 
-    // Score ≥ threshold → rank
+    // Basic score assigning and coloring
     private static final int[] THRESHOLDS = {0, 21, 36, 55, 71, 86};
 
     public static final String[] RANK_NAMES  = {"Bronze","Silver","Gold","Diamond","Epic","Legendary"};
@@ -52,24 +43,24 @@ public class DifficultyEngine {
             0xFFCD7F32,  // Bronze
             0xFF9E9E9E,  // Silver
             0xFFFFD700,  // Gold
-            0xFF29B6D4,  // Diamond  (cyan-blue)
+            0xFF29B6D4,  // Diamond  (cyan-blue just cuz dah)
             0xFF9C27B0,  // Epic     (purple)
-            0xFFE53935   // Legendary(red)
+            0xFFE53935   // Legendary(red only color that remained basiclly)
     };
 
     // ── Measurement type for each terrain ─────────────────────────────────────
     public enum MeasurementType { NONE, STAIRS, UP_STAIRS, GAP, HEIGHT, SIZE }
 
-    /** Options shown in the picker for HEIGHT terrains. measurement = index+1. */
+    // Only 2 options for Height
     public static final String[] HEIGHT_OPTIONS = {"Low", "High"};
-    /** Options shown in the picker for SIZE terrains. measurement = index+1. */
+    // I was generous for the QPs
     public static final String[] SIZE_OPTIONS   = {"Small (2ft)", "Medium (4ft)", "Big (6ft)", "Vert (8ft+)"};
 
-    /** Spin degree values for the spin picker. */
+    // Spinning amount, If you span more than 1440 contact me personally and screw off
     public static final int[] SPIN_VALUES  = {0, 180, 360, 540, 720, 900, 1080, 1440};
     public static final String[] SPIN_LABELS = {"None", "180°", "360°", "540°", "720°", "900°", "1080°", "1440°"};
 
-    // ── Trick base scores (15–46 range) ───────────────────────────────────────
+    // Trick scores, from ollie 15 to 46 I think with the tre flip, organized to kinds of tricks
     private static final Map<String, Integer> TRICK_BASES = new HashMap<>();
     static {
         // Ollies / basics
@@ -146,7 +137,7 @@ public class DifficultyEngine {
         TRICK_BASES.put("Layback Grind",              28);
     }
 
-    // ── Measurement type per terrain ─────────────────────────────────────────
+    // Cant enter an amount of stairs to a rail can u
     public static MeasurementType getMeasurementType(String terrain) {
         switch (terrain) {
             case "Down Stairs":       return MeasurementType.STAIRS;
@@ -164,14 +155,11 @@ public class DifficultyEngine {
         }
     }
 
-    // ── Terrain multiplier ────────────────────────────────────────────────────
-    /**
-     * @param terrain     Terrain name
-     * @param measurement STAIRS/GAP: count 1–30+  |  HEIGHT: 1=Low, 2=High  |  SIZE: 1–4  |  NONE: 0
-     */
+    // Gotta score for each terrain, some have measurements some dont.
+
     public static double getTerrainMultiplier(String terrain, int measurement) {
         switch (terrain) {
-            // ── Fixed multipliers (no measurement needed) ──────────────────
+            // Simple , no options.
             case "Flatground":          return 1.00;
             case "Curb":                return 1.12;
             case "Grass":               return 1.15;
@@ -185,7 +173,7 @@ public class DifficultyEngine {
             case "Pyramid":             return 1.25;
             case "Over an obsticle":    return 1.25;
 
-            // ── Height category: 1=Low, 2=High ─────────────────────────────
+            // Height, either tall or short with very small if functions.
             case "Ledge":       return (measurement == 2) ? 1.55 : 1.25;
             case "Rail":        return (measurement == 2) ? 1.70 : 1.35;
             case "Hubba":       return (measurement == 2) ? 1.75 : 1.40;
@@ -193,29 +181,28 @@ public class DifficultyEngine {
             case "Frame":       return (measurement == 2) ? 1.50 : 1.25;
             case "Frame Gap":   return (measurement == 2) ? 1.55 : 1.30;
 
-            // ── Size category: 1=Small 2=Medium 3=Large 4=Huge ─────────────
+            // The QPs need some more options
             case "Quarter Pipe": {
-                // Evenly spaced: 1.28 → 1.55 → 1.82 → 2.10
                 double[] m = {1.28, 1.55, 1.82, 2.10};
                 return m[Math.min(3, Math.max(0, measurement - 1))];
             }
 
-            // ── Down stairs: 1.0 + 1.5×(1 − e^(−0.12n)) ───────────────────
-            // Saturates smoothly toward 2.50 — no linear explosion at high counts.
-            // n=5→1.68, n=10→2.05, n=15→2.25, n=20→2.36
+            // alr this one very thought out, we want this to be logarithmic so you couldnt just spam stairs
+            // Down stairs: 1.0 + 1.5×(1 − e^(−0.12n))
+            // also the difference between 4 and 5 stairs is way more important than 9 to 10
             case "Down Stairs": {
                 int n = Math.max(1, measurement);
                 return 1.0 + 1.5 * (1.0 - Math.exp(-0.12 * n));
             }
 
-            // ── Up stairs: slightly harder (1.7 coefficient) ───────────────
+            // Up stairs is harder so 1.7* not 1.5
             // n=5→1.75, n=10→2.14, n=15→2.36
             case "Up Stairs": {
                 int n = Math.max(1, measurement);
                 return 1.0 + 1.7 * (1.0 - Math.exp(-0.12 * n));
             }
 
-            // ── Gap: similar to down stairs, softer coefficient ────────────
+            // gaps, basiclly the same thing
             case "Gap":
             case "Euro Gap": {
                 int n = Math.max(1, measurement);
@@ -226,23 +213,20 @@ public class DifficultyEngine {
         }
     }
 
-    // ── Spin helpers ──────────────────────────────────────────────────────────
+    // Spin
 
-    /** True if this trick category can have a spin (180–1440). */
+    // Only if its a spinable trick like an ollie catagory or a flip or air catagory.
     public static boolean isSpinEligible(String category) {
         return "OLLIE".equals(category) || "FLIP".equals(category) || "AIR".equals(category);
     }
 
-    /** True if this trick category always needs a BS/FS direction (independent of spin). */
+    // only if you need spin for these
     public static boolean isDirectionAlwaysEligible(String category) {
         return "GRIND".equals(category) || "SLIDE".equals(category)
                 || "STALL".equals(category) || "HANDPLANT".equals(category);
     }
 
-    /**
-     * True for tricks that inherently have a backside/frontside variant (e.g. shuvits).
-     * These always show the direction picker even without a spin.
-     */
+    // Suvits also need a spin, dont have energy to make shuvs a catag
     public static boolean isShuvEligible(String trickName) {
         if (trickName == null) return false;
         String lower = trickName.toLowerCase();
@@ -264,38 +248,35 @@ public class DifficultyEngine {
         }
     }
 
-    // ── Core calculation ──────────────────────────────────────────────────────
-    /**
-     * @return Score 0–100 (no spin bonus)
-     */
+    // Judges table
+
+    // Before spin bonus
     public static int calculate(String trick, String terrain, int measurement) {
         return calculate(trick, terrain, measurement, 0);
     }
 
-    /**
-     * @param spinDegrees 0 = no spin; 180/360/540/720/900/1080/1440 apply spin bonus
-     * @return Score 0–100
-     */
+    // Spin Score
     public static int calculate(String trick, String terrain, int measurement, int spinDegrees) {
-        int base = TRICK_BASES.containsKey(trick) ? TRICK_BASES.get(trick) : 20;
+        int base = TRICK_BASES.containsKey(trick) ? TRICK_BASES.get(trick) : 20; // Casually dodging Null inputs
         double multiplier = getTerrainMultiplier(terrain, measurement);
         double spin = getSpinMultiplier(spinDegrees);
         return Math.min(100, (int) Math.round(base * multiplier * spin));
     }
 
-    // ── Rank helpers ──────────────────────────────────────────────────────────
-    public static int getRank(int score) {
+    // The RANKKK
+    public static int getRank(int score) { // Loop through the entire list of ranks to see which rank it fits
         for (int i = THRESHOLDS.length - 1; i >= 0; i--) {
             if (score >= THRESHOLDS[i]) return i;
         }
         return RANK_BRONZE;
     }
 
+    // gettersss
     public static String getRankName(int score)  { return RANK_NAMES[getRank(score)]; }
     public static String getRankAbbr(int score)  { return RANK_ABBR[getRank(score)]; }
     public static int    getRankColor(int score) { return RANK_COLORS[getRank(score)]; }
 
-    // ── Display helper: human-readable measurement string ────────────────────
+    // I will ask the questions here, ur job as a user is to input and shut up
     public static String getMeasurementLabel(String terrain, int measurement) {
         if (measurement <= 0) return "";
         switch (getMeasurementType(terrain)) {

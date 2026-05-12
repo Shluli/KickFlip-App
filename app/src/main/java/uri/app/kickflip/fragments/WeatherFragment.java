@@ -1,15 +1,23 @@
 package uri.app.kickflip;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +34,7 @@ public class WeatherFragment extends Fragment {
 
     private EditText        etLocationInput;
     private Button          btnAddLocation;
+    private ImageButton     btnMyLocation;
     private RecyclerView    rvSpots;
     private TextView        tvEmptyState;
     private SpotAdapter     adapter;
@@ -36,7 +45,8 @@ public class WeatherFragment extends Fragment {
     private FirebaseFirestore db;
     private String            userId;
 
-    private static final String COL_LOCATIONS = "weather_locations";
+    private static final String COL_LOCATIONS        = "weather_locations";
+    private static final int    LOCATION_PERM_REQUEST = 1001;
 
     @Nullable
     @Override
@@ -46,6 +56,7 @@ public class WeatherFragment extends Fragment {
 
         etLocationInput = view.findViewById(R.id.etLocationInput);
         btnAddLocation  = view.findViewById(R.id.btnAddLocation);
+        btnMyLocation   = view.findViewById(R.id.btnMyLocation);
         rvSpots         = view.findViewById(R.id.rvSpots);
         tvEmptyState    = view.findViewById(R.id.tvEmptyState);
 
@@ -57,6 +68,7 @@ public class WeatherFragment extends Fragment {
         rvSpots.setAdapter(adapter);
 
         btnAddLocation.setOnClickListener(v -> addLocation());
+        btnMyLocation.setOnClickListener(v -> requestMyLocation());
 
         // Firebase setup
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -196,6 +208,127 @@ public class WeatherFragment extends Fragment {
               .document(spot.getFirestoreDocId())
               .delete();
         }
+    }
+
+    // ── My Location ───────────────────────────────────────────────────────────
+
+    private void requestMyLocation() {
+        if (ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                                 Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERM_REQUEST);
+            return;
+        }
+        fetchMyLocation();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == LOCATION_PERM_REQUEST
+                && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            fetchMyLocation();
+        } else {
+            Toast.makeText(getContext(), "Location permission denied", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void fetchMyLocation() {
+        LocationManager lm = (LocationManager)
+                requireContext().getSystemService(android.content.Context.LOCATION_SERVICE);
+
+        if (lm == null) {
+            Toast.makeText(getContext(), "Location unavailable", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Try last known location first (instant, no battery cost)
+        Location last = null;
+        if (ActivityCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            last = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (last == null)
+                last = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
+
+        if (last != null) {
+            addLocationByCoords(last.getLatitude(), last.getLongitude());
+            return;
+        }
+
+        // No cached location — request a single fresh fix
+        Toast.makeText(getContext(), "Getting your location…", Toast.LENGTH_SHORT).show();
+        btnMyLocation.setEnabled(false);
+
+        LocationListener listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location loc) {
+                lm.removeUpdates(this);
+                btnMyLocation.setEnabled(true);
+                addLocationByCoords(loc.getLatitude(), loc.getLongitude());
+            }
+
+            @Override public void onProviderDisabled(@NonNull String provider) {}
+            @Override public void onProviderEnabled(@NonNull String provider) {}
+        };
+
+        boolean hasGps     = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean hasNetwork = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (!hasGps && !hasNetwork) {
+            Toast.makeText(getContext(), "Enable location services", Toast.LENGTH_SHORT).show();
+            btnMyLocation.setEnabled(true);
+            return;
+        }
+
+        String provider = hasNetwork ? LocationManager.NETWORK_PROVIDER : LocationManager.GPS_PROVIDER;
+        try {
+            lm.requestSingleUpdate(provider, listener, android.os.Looper.getMainLooper());
+        } catch (SecurityException e) {
+            btnMyLocation.setEnabled(true);
+            Toast.makeText(getContext(), "Location permission error", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void addLocationByCoords(double lat, double lon) {
+        btnMyLocation.setEnabled(false);
+        weatherService.getWeatherByCoords(lat, lon, new weatherApiService.WeatherCallback() {
+            @Override
+            public void onSuccess(SkateSpot spot) {
+                // Check for duplicate by name
+                for (SkateSpot s : skateSpots) {
+                    if (s.getLocationName().equalsIgnoreCase(spot.getLocationName())) {
+                        Toast.makeText(getContext(), spot.getLocationName() + " already added",
+                                Toast.LENGTH_SHORT).show();
+                        btnMyLocation.setEnabled(true);
+                        return;
+                    }
+                }
+                skateSpots.add(spot);
+                adapter.notifyItemInserted(skateSpots.size() - 1);
+                btnMyLocation.setEnabled(true);
+                updateEmptyState();
+
+                if (db != null) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("name", spot.getLocationName());
+                    data.put("addedAt", FieldValue.serverTimestamp());
+                    db.collection("users").document(userId)
+                      .collection(COL_LOCATIONS)
+                      .add(data)
+                      .addOnSuccessListener(docRef -> spot.setFirestoreDocId(docRef.getId()));
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getContext(), "Couldn't get your city", Toast.LENGTH_SHORT).show();
+                btnMyLocation.setEnabled(true);
+            }
+        });
     }
 
     private void updateEmptyState() {
